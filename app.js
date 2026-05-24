@@ -260,8 +260,8 @@ function saveProject() {
             projectName = "Du_An_Khong_Ten";
         }
 
-        projectName = projectName.replace(/\.mobistem$/i, '');
-        let fileName = projectName + ".mobistem";
+        projectName = projectName.replace(/\.robot$/i, '');
+        let fileName = projectName + ".robot$";
 
         // 2. Chuyển đổi khối thành XML
         let xml = Blockly.Xml.workspaceToDom(workspace);
