@@ -1,0 +1,79 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="matrix_scroll" x="50" y="50">
+    <value name="TEXT">
+      <shadow type="text">
+        <field name="TEXT">XIN CHAO</field>
+      </shadow>
+    </value>
+    <value name="SPEED">
+      <shadow type="math_number">
+        <field name="NUM">0.08</field>
+      </shadow>
+    </value>
+    <next>
+      <block type="sound_vol">
+        <value name="VOL">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
+        <next>
+          <block type="sound_play">
+            <value name="TRACK">
+              <shadow type="math_number">
+                <field name="NUM">1</field>
+              </shadow>
+            </value>
+            <next>
+              <block type="servo_set">
+                <value name="ANGLE">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                </value>
+                <next>
+                  <block type="time_delay">
+                    <value name="TIME">
+                      <shadow type="math_number">
+                        <field name="NUM">2</field>
+                      </shadow>
+                    </value>
+                    <next>
+                      <block type="servo_set">
+                        <value name="ANGLE">
+                          <shadow type="math_number">
+                            <field name="NUM">90</field>
+                          </shadow>
+                        </value>
+                        <next>
+                          <block type="time_delay">
+                            <value name="TIME">
+                              <shadow type="math_number">
+                                <field name="NUM">10</field>
+                              </shadow>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+  <note_data>
+Bài 1: Lời chào của Robot
+Mục tiêu: Làm quen với cấu trúc cơ bản và các khối điều khiển màn hình, động cơ Servo.
+
+Giải thích luồng chạy:
+1. Ghi dòng chữ "XIN CHAO" lên màn hình LED ma trận với tốc độ chạy là 0.1s.
+2. Quét động cơ Servo sang trái góc 0 độ.
+3. Chờ 0.5 giây để động cơ hoàn thành góc quay.
+4. Quét động cơ Servo về lại góc 90 độ để tạo hiệu ứng "vẫy tay".
+5. Lặp lại việc chờ và vẫy tay thêm một lần nữa.
+  </note_data>
+</xml>

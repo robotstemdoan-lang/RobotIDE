@@ -1,0 +1,114 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable>v0</variable>
+    <variable>a</variable>
+    <variable>t</variable>
+    <variable>v</variable>
+  </variables>
+  <block type="variables_set" x="50" y="50">
+    <field name="VAR">v0</field>
+    <value name="VALUE">
+      <block type="math_number"><field name="NUM">0.2</field></block>
+    </value>
+    <next>
+      <block type="variables_set">
+        <field name="VAR">a</field>
+        <value name="VALUE">
+          <block type="math_number"><field name="NUM">0.05</field></block>
+        </value>
+        <next>
+          <block type="variables_set">
+            <field name="VAR">t</field>
+            <value name="VALUE">
+              <block type="math_number"><field name="NUM">0</field></block>
+            </value>
+            <next>
+              <block type="controls_whileUntil">
+                <field name="MODE">WHILE</field>
+                <value name="BOOL">
+                  <block type="logic_compare">
+                    <field name="OP">LT</field>
+                    <value name="A">
+                      <block type="variables_get"><field name="VAR">t</field></block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number"><field name="NUM">10</field></block>
+                    </value>
+                  </block>
+                </value>
+                <statement name="DO">
+                  <block type="variables_set">
+                    <field name="VAR">v</field>
+                    <value name="VALUE">
+                      <block type="math_arithmetic">
+                        <field name="OP">ADD</field>
+                        <value name="A">
+                          <block type="variables_get"><field name="VAR">v0</field></block>
+                        </value>
+                        <value name="B">
+                          <block type="math_arithmetic">
+                            <field name="OP">MULTIPLY</field>
+                            <value name="A">
+                              <block type="variables_get"><field name="VAR">a</field></block>
+                            </value>
+                            <value name="B">
+                              <block type="variables_get"><field name="VAR">t</field></block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="motor_basic">
+                        <field name="ACTION">go_forward</field>
+                        <value name="SPEED">
+                          <block type="variables_get"><field name="VAR">v</field></block>
+                        </value>
+                        <next>
+                          <block type="time_delay">
+                            <value name="TIME">
+                              <shadow type="math_number"><field name="NUM">1</field></shadow>
+                            </value>
+                            <next>
+                              <block type="variables_set">
+                                <field name="VAR">t</field>
+                                <value name="VALUE">
+                                  <block type="math_arithmetic">
+                                    <field name="OP">ADD</field>
+                                    <value name="A">
+                                      <block type="variables_get"><field name="VAR">t</field></block>
+                                    </value>
+                                    <value name="B">
+                                      <block type="math_number"><field name="NUM">1</field></block>
+                                    </value>
+                                  </block>
+                                </value>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </statement>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+  <note_data>
+Bài 3: Vật lý - Mô phỏng chuyển động Nhanh Dần Đều
+Mục tiêu: Dùng Toán học và biến số (Variables) để điều khiển tốc độ tăng dần.
+
+Giải thích luồng chạy:
+1. Bài toán ứng dụng công thức Vật lý: V = V0 + a*t
+2. Khởi tạo: Vận tốc đầu V0 = 0.2, Gia tốc a = 0.05, Thời gian t = 0.
+3. Khối vòng lặp WHILE lặp liên tục khi t &lt; 10:
+   - Mỗi lần lặp (1 chu kỳ 1 giây), t được cộng thêm 1.
+   - Vận tốc mới V sẽ được tự động tính toán lại theo công thức.
+   - Nạp Vận tốc V vừa tính vào lệnh "Chạy liên tục Tiến thẳng".
+   - Hiển thị giá trị Vận tốc V lên màn hình LED 7 thanh.
+  </note_data>
+</xml>

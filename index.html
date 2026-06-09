@@ -54,10 +54,13 @@
       </div>
 
       <div class="header-group action-buttons">
+        <button class="btn-action" onclick="toggleNotePanel()">
+          <i class="fa-solid fa-note-sticky"></i> Ghi chú
+        </button>
 
         <input type="file" id="fileInput" style="display:none" accept=".utt,.xml" onchange="loadProject(event)" />
 
-        <button class="btn-action btn-file" onclick="document.getElementById('fileInput').click()">
+        <button class="btn-action btn-file" onclick="openOpenProjectModal()">
           <i class="fa-solid fa-folder-open"></i>
           <span>Mở bài</span>
         </button>
@@ -94,23 +97,28 @@
             <div>
               <h3>Sử dụng các khối dưới đây để lập trình</h3>
               <div style="margin-top: 6px; display: flex; gap: 8px;">
-                <button id="btn-robot" style="padding: 4px 10px; border-radius: 6px; border: none; font-weight: bold; background: #00c897; color: white;">🤖 Robot</button>
+                <button id="btn-robot"
+                  style="padding: 4px 10px; border-radius: 6px; border: none; font-weight: bold; background: #00c897; color: white;">🤖
+                  Robot</button>
               </div>
             </div>
           </div>
-          
+
           <!-- Cụm trạng thái và Kết nối MQTT nằm riêng tư trong tab Blockly -->
           <div style="display: flex; align-items: center; gap: 10px;">
-            <div id="mqtt-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 8px 14px; border-radius: 999px;">
+            <div id="mqtt-status"
+              style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 8px 14px; border-radius: 999px;">
               <i class="fa-solid fa-circle-xmark" id="status-icon"></i>
               <span id="status-text">Chưa kết nối</span>
             </div>
 
-            <button id="btn-connect" onclick="connectMQTT()" style="background: linear-gradient(135deg, #00c897, #06e0ab); color: white; border: none; padding: 8px 14px; border-radius: 12px; font-weight: bold; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; box-shadow: 0 4px 12px rgba(0,200,151,0.2);">
+            <button id="btn-connect" onclick="connectMQTT()"
+              style="background: linear-gradient(135deg, #00c897, #06e0ab); color: white; border: none; padding: 8px 14px; border-radius: 12px; font-weight: bold; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; box-shadow: 0 4px 12px rgba(0,200,151,0.2);">
               <i class="fa-solid fa-plug"></i> Kết nối
             </button>
 
-            <button id="btn-disconnect" onclick="disconnectMQTT()" style="display: none; background: linear-gradient(135deg, #ff5b61, #ff4e57); color: white; border: none; padding: 8px 14px; border-radius: 12px; font-weight: bold; cursor: pointer; gap: 8px; align-items: center; box-shadow: 0 4px 12px rgba(255,91,97,0.2);">
+            <button id="btn-disconnect" onclick="disconnectMQTT()"
+              style="display: none; background: linear-gradient(135deg, #ff5b61, #ff4e57); color: white; border: none; padding: 8px 14px; border-radius: 12px; font-weight: bold; cursor: pointer; gap: 8px; align-items: center; box-shadow: 0 4px 12px rgba(255,91,97,0.2);">
               <i class="fa-solid fa-power-off"></i> Ngắt kết nối
             </button>
 
@@ -226,6 +234,12 @@
               <span>Kết nối broker</span>
             </button>
 
+            <button class="btn-connect" id="disconnectBtn" onclick="disconnectMQTT()"
+              style="display: none; background: linear-gradient(135deg, #ff5b61, #ff4e57); box-shadow: 0 8px 20px rgba(255, 91, 97, 0.3);">
+              <i class="fa-solid fa-power-off"></i>
+              <span>Ngắt kết nối</span>
+            </button>
+
             <div id="status" class="status-box">
               <i class="fa-solid fa-circle-info"></i>
               <span>Trạng thái: Chưa kết nối</span>
@@ -241,11 +255,41 @@
       <div class="matrix-modal-head">
         <div>
           <h3><i class="fa-solid fa-palette"></i> Vẽ Icon Ma Trận 8x8</h3>
-          <p>Tô pixel để tạo icon hiển thị cho LED matrix</p>
+          <p>Kéo thả chuột để vẽ nhanh icon</p>
         </div>
         <button class="matrix-close-icon" onclick="closeMatrixEditor()">
           <i class="fa-solid fa-xmark"></i>
         </button>
+      </div>
+
+      <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="loadTemplate('smile')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">🙂
+          Cười</button>
+        <button onclick="loadTemplate('sad')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">☹️
+          Buồn</button>
+        <button onclick="loadTemplate('heart')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">❤️
+          Tim</button>
+        <button onclick="loadTemplate('arrow_up')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">⬆️
+          Tiến</button>
+        <button onclick="loadTemplate('arrow_down')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">⬇️
+          Lùi</button>
+        <button onclick="loadTemplate('arrow_left')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">⬅️
+          Trái</button>
+        <button onclick="loadTemplate('arrow_right')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">➡️
+          Phải</button>
+        <button onclick="loadTemplate('check')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">✔️
+          Tích</button>
+        <button onclick="loadTemplate('warning')"
+          style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; background: #f8fafc; font-weight: bold; color: var(--text-main); transition: 0.2s;">❌
+          Cảnh báo</button>
       </div>
 
       <div class="led-grid" id="ledGrid"></div>
@@ -265,33 +309,72 @@
     </div>
   </div>
 
-  <!-- Modal Đăng nhập Admin -->
-  <div class="matrix-modal-overlay" id="loginOverlay" style="display: none;">
+
+  <div class="matrix-modal-overlay" id="openProjectOverlay" style="display: none;">
     <div class="matrix-modal">
       <div class="matrix-modal-head">
         <div>
-          <h3><i class="fa-solid fa-lock"></i> Xác thực Admin</h3>
-          <p>Vui lòng đăng nhập để cấu hình robot</p>
+          <h3><i class="fa-solid fa-folder-open"></i> Mở Bài</h3>
+          <p>Chọn nguồn tải dự án của bạn</p>
         </div>
-        <button class="matrix-close-icon" onclick="closeLoginModal()">
+        <button class="matrix-close-icon" onclick="closeOpenProjectModal()">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="config-grid" style="grid-template-columns: 1fr; padding: 0; margin-top: 20px; background: none; border: none;">
-        <div class="form-group">
-          <label>Tài khoản</label>
-          <input type="text" id="adminUser" placeholder="Nhập tài khoản..." />
-        </div>
-        <div class="form-group" style="margin-top: 12px;">
-          <label>Mật khẩu</label>
-          <input type="password" id="adminPass" placeholder="Nhập mật khẩu..." />
-        </div>
-      </div>
+      <div class="config-grid"
+        style="grid-template-columns: 1fr; padding: 0; margin-top: 20px; background: none; border: none; gap: 12px;">
+        <button class="btn-action"
+          style="width: 100%; justify-content: center; padding: 14px; font-size: 15px; font-weight: bold; background: white; color: var(--text-main); border: 2px dashed var(--primary); border-radius: 12px;"
+          onclick="closeOpenProjectModal(); document.getElementById('fileInput').click()">
+          <i class="fa-solid fa-desktop" style="color: var(--primary);"></i> Tải từ máy tính (.utt, .xml)
+        </button>
 
-      <div class="matrix-actions" style="margin-top: 24px;">
-        <button class="btn-cancel-matrix" onclick="closeLoginModal()">Hủy</button>
-        <button class="btn-save-matrix" onclick="verifyAdmin()">Đăng nhập</button>
+        <div style="border-top: 1px solid var(--line); margin: 10px 0;"></div>
+
+        <p style="font-weight: bold; margin: 0; color: var(--text-main); font-size: 14px;">Hoặc chọn bài mẫu:</p>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai1_loichao.utt')">
+          <i class="fa-solid fa-file-code" style="color: #00c897;"></i> Bài 1: Lời chào của Robot
+        </button>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai2_tranhvatcan.utt')">
+          <i class="fa-solid fa-file-code" style="color: #00c897;"></i> Bài 2: Xe tự hành tránh vật cản
+        </button>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai3_nhanhdandeu.utt')">
+          <i class="fa-solid fa-rocket" style="color: #FF6680;"></i> Bài 3: Vật lý - Nhanh dần đều
+        </button>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai4_roitudo.utt')">
+          <i class="fa-solid fa-meteor" style="color: #FF6680;"></i> Bài 4: Vật lý - Rơi tự do
+        </button>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai5_cambaolui.utt')">
+          <i class="fa-solid fa-car-side" style="color: #FFAB19;"></i> Bài 5: Cảm biến lùi xe (Đỗ xe)
+        </button>
+
+        <button class="btn-action"
+          style="width: 100%; justify-content: flex-start; padding: 14px; font-size: 15px; font-weight: bold; background: #f8fafc; color: var(--text-main); border: 1px solid var(--line); border-radius: 12px; transition: 0.2s;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'"
+          onclick="loadTemplateProject('bai6_demnguoc.utt')">
+          <i class="fa-solid fa-stopwatch" style="color: #9966FF;"></i> Bài 6: Đếm ngược phóng tàu vũ trụ
+        </button>
       </div>
     </div>
   </div>
@@ -398,46 +481,100 @@
   <xml id="toolbox_robot" style="display:none">
     <category name="🚗 ĐỘNG CƠ" colour="#0FBD8C">
       <block type="motor_straight">
-        <value name="DIST"><shadow type="math_number"><field name="NUM">30</field></shadow></value>
-        <value name="SPEED"><shadow type="math_number"><field name="NUM">0.6</field></shadow></value>
+        <value name="DIST">
+          <shadow type="math_number">
+            <field name="NUM">30</field>
+          </shadow>
+        </value>
+        <value name="SPEED">
+          <shadow type="math_number">
+            <field name="NUM">0.6</field>
+          </shadow>
+        </value>
       </block>
       <block type="motor_basic">
-        <value name="SPEED"><shadow type="math_number"><field name="NUM">0.4</field></shadow></value>
+        <value name="SPEED">
+          <shadow type="math_number">
+            <field name="NUM">0.4</field>
+          </shadow>
+        </value>
       </block>
       <block type="motor_stop"></block>
     </category>
-    <category name="🦾 ĐỘNG CƠ SERVO" colour="#FF6680">
+    <category name="🦾 TAY GẮP (SERVO)" colour="#FF6680">
       <block type="servo_set">
-        <value name="ANGLE"><shadow type="math_number"><field name="NUM">90</field></shadow></value>
+        <value name="ANGLE">
+          <shadow type="math_number">
+            <field name="NUM">90</field>
+          </shadow>
+        </value>
       </block>
     </category>
     <category name="💡 HIỂN THỊ" colour="#9966FF">
       <block type="led7_show">
-        <value name="NUM"><shadow type="math_number"><field name="NUM">1234</field></shadow></value>
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">1234</field>
+          </shadow>
+        </value>
       </block>
       <block type="matrix_scroll">
-        <value name="TEXT"><shadow type="text"><field name="TEXT">XIN CHAO</field></shadow></value>
-        <value name="SPEED"><shadow type="math_number"><field name="NUM">0.08</field></shadow></value>
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">XIN CHAO</field>
+          </shadow>
+        </value>
+        <value name="SPEED">
+          <shadow type="math_number">
+            <field name="NUM">0.08</field>
+          </shadow>
+        </value>
       </block>
       <block type="matrix_icon_custom">
-        <value name="X"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
-        <value name="Y"><shadow type="math_number"><field name="NUM">0</field></shadow></value>
+        <value name="X">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <value name="Y">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
       </block>
     </category>
     <category name="🎵 ÂM THANH" colour="#D65CD6">
       <block type="sound_play">
-        <value name="TRACK"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+        <value name="TRACK">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
       </block>
       <block type="sound_vol">
-        <value name="VOL"><shadow type="math_number"><field name="NUM">20</field></shadow></value>
+        <value name="VOL">
+          <shadow type="math_number">
+            <field name="NUM">20</field>
+          </shadow>
+        </value>
       </block>
       <block type="sound_stop"></block>
     </category>
     <category name="📡 CẢM BIẾN" colour="#5CB1D6">
       <block type="sensor_dist"></block>
+      <block type="convert_tostring"></block>
+      <block type="convert_tonumber"></block>
       <block type="get_time_internet"></block>
     </category>
   </xml>
+
+  <div id="notePanel" style="display: none; position: absolute; top: 80px; right: 20px; width: 350px; bottom: 40px; background: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; flex-direction: column;">
+    <div style="background: #ffe58f; padding: 10px 15px; font-weight: bold; border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center; color: #d48806;">
+        <span><i class="fa-solid fa-book-open"></i> Ghi Chú Bài Học</span>
+        <button onclick="toggleNotePanel()" style="background:none; border:none; cursor:pointer; font-size: 16px; color: #d48806;"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <textarea id="noteContent" placeholder="Viết ghi chú giải thích thuật toán vào đây..." style="flex: 1; border: none; background: transparent; padding: 15px; font-size: 14px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; resize: none; outline: none; line-height: 1.6; color: #333;"></textarea>
+  </div>
 
   <script src="blocks.js"></script>
   <script src="app.js"></script>

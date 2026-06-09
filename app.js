@@ -1,7 +1,7 @@
 // ==========================================
 // 1. KHỞI TẠO BLOCKLY & CODEMIRROR (LIGHT THEME)
 // ==========================================
-const mobiStemTheme = Blockly.Theme.defineTheme('mobiStemTheme', {
+const uttStemTheme = Blockly.Theme.defineTheme('uttStemTheme', {
     'base': Blockly.Themes.Classic,
     'componentStyles': {
         'workspaceBackgroundColour': '#ffffff', /* Màu nền khu vực kéo thả (Trắng) */
@@ -25,7 +25,7 @@ function buildToolbox(deviceId) {
 
 const workspace = Blockly.inject('blocklyDiv', {
     toolbox: buildToolbox('robot'), // Thay vì document.getElementById('toolbox')
-    theme: mobiStemTheme,
+    theme: uttStemTheme,
     grid: { spacing: 20, length: 3, colour: '#e2e8f0', snap: true },
     trashcan: true,
     zoom: { controls: true, wheel: true, startScale: 1.18, maxScale: 2.5, minScale: 0.7, scaleSpeed: 1.1, pinch: true }
@@ -50,45 +50,12 @@ window.onload = function () {
 // ==========================================
 // 2. GIAO DIỆN CHUYỂN TAB & ẨN HIỆN
 // ==========================================
-let pendingTabBtn = null; // Biến lưu tạm nút tab MQTT đang chờ đăng nhập
-
 function switchTab(tabId, btn) {
-    // Nếu bấm vào tab MQTT, chặn lại và hiện form đăng nhập
-    if (tabId === 'tab-mqtt') {
-        document.getElementById('loginOverlay').style.display = 'flex';
-        pendingTabBtn = btn;
-        return; 
-    }
-    // Nếu là tab Blockly thì cho qua luôn
-    executeSwitchTab(tabId, btn);
-}
-
-// Hàm thực thi chuyển tab (sau khi đã duyệt)
-function executeSwitchTab(tabId, btn) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
     btn.classList.add('active');
     if (tabId === 'tab-blockly') { Blockly.svgResize(workspace); if (codeEditor) codeEditor.refresh(); }
-}
-
-function closeLoginModal() {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('adminUser').value = '';
-    document.getElementById('adminPass').value = '';
-    pendingTabBtn = null;
-}
-
-function verifyAdmin() {
-    const user = document.getElementById('adminUser').value;
-    const pass = document.getElementById('adminPass').value;
-
-    if (user === "admin" && pass === "12345678") {
-        closeLoginModal();
-        executeSwitchTab('tab-mqtt', pendingTabBtn); // Đăng nhập đúng thì gọi hàm chuyển tab
-    } else {
-        alert("⚠️ Tài khoản hoặc mật khẩu không chính xác!");
-    }
 }
 
 // Giữ nguyên hàm toggleCodePanel và togglePassword ở dưới...
@@ -109,10 +76,58 @@ function togglePassword() {
 // ==========================================
 let currentEditingBlock = null;
 const gridDiv = document.getElementById('ledGrid');
+
+let isDrawing = false;
+let drawMode = true; // true = tô, false = xóa
+
+gridDiv.addEventListener('contextmenu', (e) => e.preventDefault()); // Chặn menu chuột phải mặc định
+
+gridDiv.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    e.preventDefault(); // Ngăn chọn text khi kéo
+});
+
+window.addEventListener('mouseup', () => {
+    isDrawing = false;
+});
+
 for (let i = 0; i < 64; i++) {
     let cell = document.createElement('div'); cell.className = 'led-cell';
-    cell.onclick = function () { this.classList.toggle('on'); updateHexPreview(); };
+
+    cell.addEventListener('mousedown', function (e) {
+        drawMode = (e.button !== 2); // Chuột trái/giữa = tô (true), Chuột phải = xóa (false)
+        if (drawMode) this.classList.add('on');
+        else this.classList.remove('on');
+        updateHexPreview();
+    });
+
+    cell.addEventListener('mouseenter', function () {
+        if (isDrawing) {
+            if (drawMode) this.classList.add('on');
+            else this.classList.remove('on');
+            updateHexPreview();
+        }
+    });
+
     gridDiv.appendChild(cell);
+}
+
+const templates = {
+    smile: "[0x3C,0x42,0xA5,0x81,0xA5,0x99,0x42,0x3C]",
+    sad: "[0x3C,0x42,0xA5,0x81,0x99,0xA5,0x42,0x3C]",
+    heart: "[0x00,0x66,0xFF,0xFF,0x7E,0x3C,0x18,0x00]",
+    arrow_up: "[0x18,0x3C,0x7E,0xFF,0x18,0x18,0x18,0x18]",
+    arrow_down: "[0x18,0x18,0x18,0x18,0xFF,0x7E,0x3C,0x18]",
+    arrow_left: "[0x10,0x30,0x70,0xFF,0xFF,0x70,0x30,0x10]",
+    arrow_right: "[0x08,0x0C,0x0E,0xFF,0xFF,0x0E,0x0C,0x08]",
+    check: "[0x00,0x01,0x02,0x04,0x88,0x50,0x20,0x00]",
+    warning: "[0x81,0x42,0x24,0x18,0x18,0x24,0x42,0x81]"
+};
+
+function loadTemplate(name) {
+    if (templates[name]) {
+        parseHexToGrid(templates[name]);
+    }
 }
 
 function openMatrixEditor(block) {
@@ -159,45 +174,89 @@ function parseHexToGrid(hexStr) {
 // 4. MQTT & NẠP CODE
 // ==========================================
 function updateMQTTStatus(state, msg) {
+    // Nút ở tab Blockly
     const icon = document.getElementById('status-icon');
     const text = document.getElementById('status-text');
     const btnConn = document.getElementById('btn-connect');
     const btnDisconn = document.getElementById('btn-disconnect');
     const statusContainer = document.getElementById('mqtt-status');
 
+    // Nút ở tab Settings (Cấu hình)
+    const settingsStatusBox = document.getElementById('status');
+    const settingsConnectBtn = document.getElementById('connectBtn');
+    const settingsDisconnectBtn = document.getElementById('disconnectBtn');
+
+    // Cập nhật text chung
     text.innerText = msg;
 
     if (state === 'connecting') {
+        // Tab Blockly
         icon.className = "fa-solid fa-spinner fa-spin";
         statusContainer.style.color = "#eab308"; // Vàng
         btnConn.disabled = true;
+
+        // Tab Settings
+        if (settingsStatusBox) {
+            settingsStatusBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Trạng thái: ${msg}</span>`;
+            settingsStatusBox.className = "status-box";
+            settingsStatusBox.style.color = "#eab308";
+        }
+        if (settingsConnectBtn) settingsConnectBtn.disabled = true;
+
     } else if (state === 'connected') {
+        // Tab Blockly
         icon.className = "fa-solid fa-circle-check";
         statusContainer.style.color = "#04825d"; // Xanh lá
         btnConn.style.display = "none";
         btnDisconn.style.display = "inline-flex";
         btnConn.disabled = false;
+
+        // Tab Settings
+        if (settingsStatusBox) {
+            settingsStatusBox.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Trạng thái: ${msg}</span>`;
+            settingsStatusBox.className = "status-box connected";
+            settingsStatusBox.style.color = ""; // Xóa màu inline để nhận class
+        }
+        if (settingsConnectBtn) {
+            settingsConnectBtn.style.display = "none";
+            settingsConnectBtn.disabled = false;
+        }
+        if (settingsDisconnectBtn) settingsDisconnectBtn.style.display = "inline-flex";
+
     } else { // disconnected or error
+        // Tab Blockly
         icon.className = "fa-solid fa-circle-xmark";
         statusContainer.style.color = state === 'error' ? "#dc2626" : "#64748b"; // Đỏ hoặc Xám
         btnConn.style.display = "inline-flex";
         btnDisconn.style.display = "none";
         btnConn.disabled = false;
+
+        // Tab Settings
+        if (settingsStatusBox) {
+            settingsStatusBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i><span>Trạng thái: ${msg}</span>`;
+            settingsStatusBox.className = state === 'error' ? "status-box error" : "status-box";
+            settingsStatusBox.style.color = "";
+        }
+        if (settingsConnectBtn) {
+            settingsConnectBtn.style.display = "inline-flex";
+            settingsConnectBtn.disabled = false;
+        }
+        if (settingsDisconnectBtn) settingsDisconnectBtn.style.display = "none";
     }
 }
 
 function connectMQTT() {
-    const host = document.getElementById('host').value; 
+    const host = document.getElementById('host').value;
     const port = parseInt(document.getElementById('port').value);
-    const user = document.getElementById('user').value; 
+    const user = document.getElementById('user').value;
     const pass = document.getElementById('pass').value;
 
     updateMQTTStatus('connecting', 'Đang kết nối...');
 
-    client = new Paho.MQTT.Client(host, port, "MobiSTEM_" + Math.random().toString(16).substr(2, 5));
-    
-    client.onConnectionLost = (res) => { 
-        updateMQTTStatus('error', 'Mất kết nối!'); 
+    client = new Paho.MQTT.Client(host, port, "UTTSTEM_" + Math.random().toString(16).substr(2, 5));
+
+    client.onConnectionLost = (res) => {
+        updateMQTTStatus('error', 'Mất kết nối!');
     };
 
     client.connect({
@@ -214,20 +273,35 @@ function disconnectMQTT() {
     }
 }
 
+function showToast(msg, type = 'success') {
+    let toast = document.getElementById('utt-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'utt-toast';
+        document.body.appendChild(toast);
+    }
+    toast.className = 'toast show ' + type;
+    toast.innerHTML = msg;
+    if (toast.timeoutId) clearTimeout(toast.timeoutId);
+    toast.timeoutId = setTimeout(() => {
+        toast.className = toast.className.replace('show', '').trim();
+    }, 3000);
+}
+
 function sendData() {
-    if (!client || !client.isConnected()) return alert("⚠️ Vui lòng KẾT NỐI BROKER trước!");
+    if (!client || !client.isConnected()) return showToast("⚠️ Vui lòng KẾT NỐI BROKER trước!", "error");
     const code = codeEditor.getValue();
-    if (!code.trim()) return alert("Không có code để nạp!");
+    if (!code.trim()) return showToast("⚠️ Không có code để nạp!", "error");
     const payloadObj = {}; payloadObj[document.getElementById('jsonKey').value || "main"] = code;
     try {
         let msg = new Paho.MQTT.Message(JSON.stringify(payloadObj));
         msg.destinationName = document.getElementById('topic').value;
-        client.send(msg); alert("🚀 Đã nạp Code thành công!");
-    } catch (e) { alert("Lỗi gửi: " + e.message); }
+        client.send(msg); showToast("🚀 Đã nạp Code thành công!", "success");
+    } catch (e) { showToast("Lỗi gửi: " + e.message, "error"); }
 }
 
 function sendStopCommand() {
-    if (!client || !client.isConnected()) return alert("⚠️ Vui lòng KẾT NỐI BROKER trước!");
+    if (!client || !client.isConnected()) return showToast("⚠️ Vui lòng KẾT NỐI BROKER trước!", "error");
 
     // Sử dụng dấu backtick (`) để tạo chuỗi nhiều dòng trong JavaScript
     const stopScript = `print("exit")`; // Mình giữ lại print("exit") để tương thích với ngắt vòng lặp (nếu có)
@@ -239,16 +313,66 @@ function sendStopCommand() {
         let msg = new Paho.MQTT.Message(JSON.stringify(payloadObj));
         msg.destinationName = document.getElementById('topic').value;
         client.send(msg);
-        alert("🛑 Đã gửi lệnh NGẮT CODE và dọn dẹp phần cứng!");
+        showToast("🛑 Đã gửi lệnh NGẮT CODE và dọn dẹp phần cứng!", "success");
     } catch (e) {
-        alert("Lỗi gửi: " + e.message);
+        showToast("Lỗi gửi: " + e.message, "error");
     }
+}
+
+// ==========================================
+// 5. QUẢN LÝ DỰ ÁN (LƯU & MỞ)
+// ==========================================
+
+function openOpenProjectModal() {
+    document.getElementById('openProjectOverlay').style.display = 'flex';
+}
+
+function closeOpenProjectModal() {
+    document.getElementById('openProjectOverlay').style.display = 'none';
+}
+
+function loadTemplateProject(fileName) {
+    fetch('template_project/' + fileName)
+        .then(response => {
+            if (!response.ok) throw new Error("Lỗi tải file");
+            return response.text();
+        })
+        .then(xmlText => {
+            // Xử lý nạp phần Ghi chú nếu có
+            let noteMatch = xmlText.match(/<note_data>([\s\S]*?)<\/note_data>/);
+            if (noteMatch) {
+                document.getElementById('noteContent').value = noteMatch[1].trim();
+                document.getElementById('notePanel').style.display = 'flex';
+                xmlText = xmlText.replace(/<note_data>[\s\S]*?<\/note_data>/, '');
+            } else {
+                document.getElementById('noteContent').value = '';
+                document.getElementById('notePanel').style.display = 'none';
+            }
+
+            let parser = new DOMParser();
+            let xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            if (xmlDoc.getElementsByTagName("parsererror").length > 0) {
+                showToast("File mẫu không hợp lệ", "error");
+                return;
+            }
+            workspace.clear();
+            Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
+            showToast("Đã tải " + fileName.replace('.utt', ''), "success");
+            closeOpenProjectModal();
+        })
+        .catch(err => {
+            if (window.location.protocol === 'file:') {
+                showToast("Vui lòng chạy bằng Local Server để tải bài mẫu.", "error");
+            } else {
+                showToast("Không thể tải bài mẫu. Lỗi: " + err.message, "error");
+            }
+        });
 }
 
 function saveProject() {
     try {
         // 1. Hiển thị hộp thoại nhập tên dự án
-        let projectName = prompt("Vui lòng nhập tên dự án của bạn:", "Du_An_Robot");
+        let projectName = prompt("Vui lòng nhập tên dự án của bạn:", "Bai_hoc_1");
 
         // Nếu người dùng bấm "Hủy" (Cancel) thì không làm gì cả
         if (projectName === null) {
@@ -267,6 +391,12 @@ function saveProject() {
         let xml = Blockly.Xml.workspaceToDom(workspace);
         let xmlText = Blockly.Xml.domToText(xml);
 
+        // Chèn nội dung ghi chú (nếu có) vào cuối file XML trước thẻ đóng
+        let note = document.getElementById('noteContent').value;
+        if (note && note.trim() !== "") {
+            xmlText = xmlText.replace('</xml>', `  <note_data>\n${note}\n</note_data>\n</xml>`);
+        }
+
         // 3. Tạo file và tải xuống
         let blob = new Blob([xmlText], { type: 'text/xml' });
         let url = URL.createObjectURL(blob);
@@ -280,9 +410,18 @@ function saveProject() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        alert("💾 Đã tải file [" + fileName + "] về máy thành công!");
+        showToast("💾 Đã tải file [" + fileName + "] về máy thành công!", "success");
     } catch (e) {
-        alert("Lỗi khi lưu bài: " + e);
+        showToast("Lỗi khi lưu bài: " + e, "error");
+    }
+}
+
+function toggleNotePanel() {
+    let panel = document.getElementById('notePanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'flex';
+    } else {
+        panel.style.display = 'none';
     }
 }
 
@@ -296,6 +435,17 @@ function loadProject(event) {
         try {
             let xmlText = e.target.result;
 
+            // Xử lý nạp phần Ghi chú nếu có
+            let noteMatch = xmlText.match(/<note_data>([\s\S]*?)<\/note_data>/);
+            if (noteMatch) {
+                document.getElementById('noteContent').value = noteMatch[1].trim();
+                document.getElementById('notePanel').style.display = 'flex';
+                xmlText = xmlText.replace(/<note_data>[\s\S]*?<\/note_data>/, '');
+            } else {
+                document.getElementById('noteContent').value = '';
+                document.getElementById('notePanel').style.display = 'none';
+            }
+
             // Chuyển chuỗi văn bản thành cấu trúc XML
             let xml = Blockly.utils.xml.textToDom(xmlText);
 
@@ -305,9 +455,9 @@ function loadProject(event) {
             // Nhúng XML vào lại bàn làm việc thành các khối kéo thả
             Blockly.Xml.domToWorkspace(xml, workspace);
 
-            alert("📂 Đã mở bài thành công!");
+            showToast("📂 Đã mở bài thành công!", "success");
         } catch (err) {
-            alert("⚠️ Lỗi: File không đúng định dạng của STEM!\n" + err);
+            showToast("⚠️ Lỗi: File không đúng định dạng của hệ thống!<br>" + err, "error");
         }
 
         // Reset lại thẻ input file để có thể chọn lại chính file đó lần sau

@@ -1,0 +1,111 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable>g</variable>
+    <variable>t</variable>
+    <variable>s</variable>
+  </variables>
+  <block type="variables_set" x="50" y="50">
+    <field name="VAR">g</field>
+    <value name="VALUE">
+      <block type="math_number"><field name="NUM">9.8</field></block>
+    </value>
+    <next>
+      <block type="variables_set">
+        <field name="VAR">t</field>
+        <value name="VALUE">
+          <block type="math_number"><field name="NUM">0</field></block>
+        </value>
+        <next>
+          <block type="controls_whileUntil">
+            <field name="MODE">WHILE</field>
+            <value name="BOOL">
+              <block type="logic_compare">
+                <field name="OP">LT</field>
+                <value name="A">
+                  <block type="variables_get"><field name="VAR">t</field></block>
+                </value>
+                <value name="B">
+                  <block type="math_number"><field name="NUM">5</field></block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO">
+              <block type="variables_set">
+                <field name="VAR">s</field>
+                <value name="VALUE">
+                  <block type="math_arithmetic">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <block type="math_number"><field name="NUM">0.5</field></block>
+                    </value>
+                    <value name="B">
+                      <block type="math_arithmetic">
+                        <field name="OP">MULTIPLY</field>
+                        <value name="A">
+                          <block type="variables_get"><field name="VAR">g</field></block>
+                        </value>
+                        <value name="B">
+                          <block type="math_arithmetic">
+                            <field name="OP">POWER</field>
+                            <value name="A">
+                              <block type="variables_get"><field name="VAR">t</field></block>
+                            </value>
+                            <value name="B">
+                              <block type="math_number"><field name="NUM">2</field></block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <next>
+                  <block type="led7_show">
+                    <value name="NUM">
+                      <block type="variables_get"><field name="VAR">s</field></block>
+                    </value>
+                    <next>
+                      <block type="time_delay">
+                        <value name="TIME">
+                          <shadow type="math_number"><field name="NUM">1</field></shadow>
+                        </value>
+                        <next>
+                          <block type="variables_set">
+                            <field name="VAR">t</field>
+                            <value name="VALUE">
+                              <block type="math_arithmetic">
+                                <field name="OP">ADD</field>
+                                <value name="A">
+                                  <block type="variables_get"><field name="VAR">t</field></block>
+                                </value>
+                                <value name="B">
+                                  <block type="math_number"><field name="NUM">1</field></block>
+                                </value>
+                              </block>
+                            </value>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+  <note_data>
+Bài 4: Vật lý - Mô phỏng Rơi Tự Do
+Mục tiêu: Dùng Toán học phức tạp mô phỏng quãng đường s.
+
+Giải thích luồng chạy:
+1. Bài toán ứng dụng công thức quãng đường rơi: s = 0.5 * g * t^2
+2. Khởi tạo gia tốc trọng trường Trái Đất g = 9.8 và thời gian ban đầu t = 0.
+3. Vòng lặp WHILE thực hiện mô phỏng khi t &lt; 5 giây:
+   - Tính quãng đường s bằng các khối Toán học (Nhân và Hàm số mũ ^2).
+   - Hiển thị số s (Quãng đường rơi) ra màn hình LED 7 thanh.
+   - Trễ 1 giây để quan sát, sau đó tăng t lên 1 để tính thời điểm rơi tiếp theo.
+  </note_data>
+</xml>

@@ -1,0 +1,84 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="main_loop" x="50" y="50">
+    <statement name="DO">
+      <block type="led7_show">
+        <value name="NUM">
+          <block type="sensor_dist"></block>
+        </value>
+        <next>
+          <block type="controls_if">
+            <mutation elseif="1" else="1"></mutation>
+            <value name="IF0">
+              <block type="logic_compare">
+                <field name="OP">LT</field>
+                <value name="A">
+                  <block type="sensor_dist"></block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">15</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="matrix_icon_custom">
+                <field name="HEX_ARRAY">[0x18,0x18,0x18,0x18,0x18,0x00,0x18,0x18]</field>
+                <value name="X"><block type="math_number"><field name="NUM">0</field></block></value>
+                <value name="Y"><block type="math_number"><field name="NUM">0</field></block></value>
+                <next>
+                  <block type="time_delay">
+                    <value name="TIME"><shadow type="math_number"><field name="NUM">0.2</field></shadow></value>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <value name="IF1">
+              <block type="logic_compare">
+                <field name="OP">LT</field>
+                <value name="A">
+                  <block type="sensor_dist"></block>
+                </value>
+                <value name="B">
+                  <block type="math_number">
+                    <field name="NUM">30</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO1">
+              <block type="matrix_icon_custom">
+                <field name="HEX_ARRAY">[0x00,0x24,0x24,0x00,0x00,0x7E,0x00,0x00]</field>
+                <value name="X"><block type="math_number"><field name="NUM">0</field></block></value>
+                <value name="Y"><block type="math_number"><field name="NUM">0</field></block></value>
+                <next>
+                  <block type="time_delay">
+                    <value name="TIME"><shadow type="math_number"><field name="NUM">0.8</field></shadow></value>
+                  </block>
+                </next>
+              </block>
+            </statement>
+            <statement name="ELSE">
+              <block type="matrix_icon_custom">
+                <field name="HEX_ARRAY">[0x00,0x24,0x24,0x00,0x42,0x3C,0x00,0x00]</field>
+                <value name="X"><block type="math_number"><field name="NUM">0</field></block></value>
+                <value name="Y"><block type="math_number"><field name="NUM">0</field></block></value>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <note_data>
+Bài 5: Ứng dụng Cảm biến đỗ xe báo động lùi
+Mục tiêu: Kết hợp Cảm biến, Màn hình và Vòng lặp liên tục để tạo hệ thống cảnh báo.
+
+Giải thích luồng chạy:
+1. Vòng lặp chính luôn cập nhật Khoảng cách từ siêu âm lên LED 7 thanh để tài xế quan sát.
+2. Dùng cấu trúc Điều kiện phân nhánh nhiều cấp (IF - ELSE IF - ELSE):
+   - Mức độ 1 (Dưới 15cm): Rất nguy hiểm! LED Ma trận hiện "Dấu chấm than !". Cảnh báo nháy rất nhanh (Trễ 0.2s).
+   - Mức độ 2 (Dưới 30cm): Đã đến gần. LED Ma trận hiện "Mặt bình thường". Cảnh báo nháy chậm (Trễ 0.8s).
+   - Mức độ 3 (Trường hợp còn lại - Trên 30cm): Khu vực an toàn. LED Ma trận hiện "Mặt cười".
+  </note_data>
+</xml>

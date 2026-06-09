@@ -1,0 +1,96 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable>t</variable>
+  </variables>
+  <block type="variables_set" x="50" y="50">
+    <field name="VAR">t</field>
+    <value name="VALUE">
+      <block type="math_number">
+        <field name="NUM">5</field>
+      </block>
+    </value>
+    <next>
+      <block type="controls_whileUntil">
+        <field name="MODE">WHILE</field>
+        <value name="BOOL">
+          <block type="logic_compare">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="variables_get"><field name="VAR">t</field></block>
+            </value>
+            <value name="B">
+              <block type="math_number"><field name="NUM">0</field></block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO">
+          <block type="led7_show">
+            <value name="NUM">
+              <block type="variables_get"><field name="VAR">t</field></block>
+            </value>
+            <next>
+              <block type="time_delay">
+                <value name="TIME"><shadow type="math_number"><field name="NUM">1</field></shadow></value>
+                <next>
+                  <block type="variables_set">
+                    <field name="VAR">t</field>
+                    <value name="VALUE">
+                      <block type="math_arithmetic">
+                        <field name="OP">MINUS</field>
+                        <value name="A"><block type="variables_get"><field name="VAR">t</field></block></value>
+                        <value name="B"><block type="math_number"><field name="NUM">1</field></block></value>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <next>
+          <block type="matrix_scroll">
+            <value name="TEXT">
+              <shadow type="text">
+                <field name="TEXT">GO GO!</field>
+              </shadow>
+            </value>
+            <value name="SPEED">
+              <shadow type="math_number"><field name="NUM">0.08</field></shadow>
+            </value>
+            <next>
+              <block type="motor_basic">
+                <field name="ACTION">go_forward</field>
+                <value name="SPEED">
+                  <shadow type="math_number"><field name="NUM">0.7</field></shadow>
+                </value>
+                <next>
+                  <block type="controls_whileUntil">
+                    <field name="MODE">WHILE</field>
+                    <value name="BOOL">
+                      <block type="logic_boolean">
+                        <field name="BOOL">TRUE</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </next>
+  </block>
+  <note_data>
+Bài 6: Đếm ngược phóng tàu vũ trụ
+Mục tiêu: Ứng dụng vòng lặp đếm lùi và điều khiển trạng thái tuần tự.
+
+Giải thích luồng chạy:
+1. Khởi tạo đồng hồ đếm ngược với biến t = 5.
+2. Vòng lặp WHILE đếm lùi (Trong khi t &gt; 0):
+   - Hiện số t hiện tại lên LED 7 thanh.
+   - Chờ 1 giây. Sau đó trừ t đi 1 đơn vị.
+3. Cứ lặp lại như vậy đến khi t = 0 thì điều kiện (t &gt; 0) bị SAI, máy sẽ nhảy thoát ra khỏi vòng lặp.
+4. Ngay khi thoát vòng lặp đếm ngược, màn hình ma trận chạy chữ "GO GO!" và động cơ lập tức được bật chạy thẳng lên phía trước.
+5. Vòng lặp "Trong khi ĐÚNG" (Vô hạn) ở cuối giúp treo chương trình lại, nhờ vậy động cơ sẽ giữ trạng thái chạy thẳng mãi mãi.
+  </note_data>
+</xml>

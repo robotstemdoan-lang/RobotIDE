@@ -10,14 +10,16 @@ Blockly.Blocks['motor_straight'] = { init: function () { this.appendDummyInput()
 Blockly.Blocks['motor_basic'] = { init: function () { this.appendDummyInput().appendField("🚗 Chạy liên tục").appendField(new Blockly.FieldDropdown([["Tiến thẳng", "go_forward"], ["Lùi lại", "go_backward"], ["Xoay trái", "turn_left"], ["Xoay phải", "turn_right"]]), "ACTION"); this.appendValueInput("SPEED").setCheck("Number").appendField("tốc độ"); this.setInputsInline(true); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#0FBD8C"); } };
 Blockly.Blocks['motor_stop'] = { init: function () { this.appendDummyInput().appendField("🛑 Dừng tất cả động cơ"); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#0FBD8C"); } };
 
-Blockly.Blocks['servo_set'] = { init: function () {
+Blockly.Blocks['servo_set'] = {
+    init: function () {
         this.appendDummyInput().appendField("🦾 Cài góc cho servo");
         this.appendValueInput("ANGLE").setCheck("Number").appendField("ở (độ)");
         this.setInputsInline(true);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour("#FF6680");
-    } };
+    }
+};
 
 Blockly.Blocks['matrix_icon_custom'] = { init: function () { this.appendDummyInput().appendField("🔠 Matrix vẽ Icon").appendField(new Blockly.FieldImage(paletteIcon, 22, 22, "🎨 Vẽ", function (field) { openMatrixEditor(field.getSourceBlock()); })).appendField(new Blockly.FieldTextInput("[0x00,0x66,0xFF,0xFF,0x7E,0x3C,0x18,0x00]"), "HEX_ARRAY"); this.appendValueInput("X").setCheck("Number").appendField("tại X"); this.appendValueInput("Y").setCheck("Number").appendField("Y"); this.setInputsInline(true); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9966FF"); } };
 Blockly.Blocks['led7_show'] = { init: function () { this.appendValueInput("NUM").setCheck("Number").appendField("💡 LED 7 hiện số"); this.setInputsInline(true); this.setPreviousStatement(true, null); this.setNextStatement(true, null); this.setColour("#9966FF"); } };
@@ -65,7 +67,7 @@ pyGen.forBlock['motor_straight'] = function (block, generator) {
     let dist = generator.valueToCode(block, 'DIST', pyGen.ORDER_ATOMIC) || '0';
     let speedSafe = clampCode(generator.valueToCode(block, 'SPEED', pyGen.ORDER_ATOMIC) || '0', 0, 1);
     if (type === 'move_straight') return `robot.move_forward_cm(${dist}, max_speed=${speedSafe})\n`;
-    return `robot.move_backward_cm(${dist}, max_speed=${speedSafe})\n`; 
+    return `robot.move_backward_cm(${dist}, max_speed=${speedSafe})\n`;
 };
 
 pyGen.forBlock['motor_basic'] = function (block, generator) {
@@ -89,9 +91,9 @@ pyGen.forBlock['matrix_icon_custom'] = function (block) {
     return `matrix.draw_custom(${hexArr})\n`;
 };
 
-pyGen.forBlock['led7_show'] = function (block, generator) { 
-    let num = generator.valueToCode(block, 'NUM', pyGen.ORDER_ATOMIC) || '0'; 
-    return `display.display_number(${num})\n`; 
+pyGen.forBlock['led7_show'] = function (block, generator) {
+    let num = generator.valueToCode(block, 'NUM', pyGen.ORDER_ATOMIC) || '0';
+    return `display.display_number(${num})\n`;
 };
 
 pyGen.forBlock['matrix_scroll'] = function (block, generator) {
@@ -100,9 +102,9 @@ pyGen.forBlock['matrix_scroll'] = function (block, generator) {
     return `matrix.scroll_text(str(${text}), speed=${speed}, loop=False)\n`;
 };
 
-pyGen.forBlock['sound_play'] = function (block, generator) { 
-    let track = generator.valueToCode(block, 'TRACK', pyGen.ORDER_ATOMIC) || '1'; 
-    return `player.play_track(${track})\n`; 
+pyGen.forBlock['sound_play'] = function (block, generator) {
+    let track = generator.valueToCode(block, 'TRACK', pyGen.ORDER_ATOMIC) || '1';
+    return `player.play_track(${track})\n`;
 };
 
 pyGen.forBlock['sound_vol'] = function (block, generator) {
@@ -112,8 +114,8 @@ pyGen.forBlock['sound_vol'] = function (block, generator) {
 
 pyGen.forBlock['sound_stop'] = function () { return `player.stop()\n`; };
 
-pyGen.forBlock['sensor_dist'] = function () { 
-    return ['hcsr04.get_distance()', pyGen.ORDER_ATOMIC]; 
+pyGen.forBlock['sensor_dist'] = function () {
+    return ['hcsr04.get_distance()', pyGen.ORDER_ATOMIC];
 };
 
 pyGen.forBlock['convert_tostring'] = function (block, generator) {
@@ -126,9 +128,7 @@ pyGen.forBlock['convert_tonumber'] = function (block, generator) {
 };
 pyGen.forBlock['get_time_internet'] = function (block) {
     let type = block.getFieldValue('TIME_TYPE');
-    let code = '';
-    if (type === 'HOUR') code = 'time.localtime().tm_hour';
-    else if (type === 'MINUTE') code = 'time.localtime().tm_min';
-    else if (type === 'SECOND') code = 'time.localtime().tm_sec';
-    return [code, pyGen.ORDER_ATOMIC];
+    if (type === 'HOUR') return ['time.localtime()[3]', pyGen.ORDER_FUNCTION_CALL];
+    if (type === 'MINUTE') return ['time.localtime()[4]', pyGen.ORDER_FUNCTION_CALL];
+    return ['time.localtime()[5]', pyGen.ORDER_FUNCTION_CALL];
 };
