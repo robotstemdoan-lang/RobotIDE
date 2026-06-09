@@ -257,11 +257,11 @@ function saveProject() {
 
         // Nếu người dùng xóa trắng rồi bấm OK, tự động gán tên mặc định
         if (projectName.trim() === "") {
-            projectName = "Du_An_Khong_Ten";
+            projectName = "Bai_hoc_1";
         }
 
-        projectName = projectName.replace(/\.robot$/i, '');
-        let fileName = projectName + ".robot$";
+        projectName = projectName.replace(/\.utt$/i, '');
+        let fileName = projectName + ".utt";
 
         // 2. Chuyển đổi khối thành XML
         let xml = Blockly.Xml.workspaceToDom(workspace);
@@ -307,7 +307,7 @@ function loadProject(event) {
 
             alert("📂 Đã mở bài thành công!");
         } catch (err) {
-            alert("⚠️ Lỗi: File không đúng định dạng của MobiSTEM!\n" + err);
+            alert("⚠️ Lỗi: File không đúng định dạng của STEM!\n" + err);
         }
 
         // Reset lại thẻ input file để có thể chọn lại chính file đó lần sau
